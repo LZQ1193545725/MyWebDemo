@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="../layui/css/layui.css" rel="stylesheet" />
+	</head>
+	<div style="text-align: left;margin-top: 10px;">
+		<div class="layui-inline">
+			<label class="layui-form-label">时间：</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" id="test1" placeholder="yyyy-MM-dd">
+			</div>
+			<input type="button" class="layui-btn" value="查询" />
+		</div>
+
+		<div class="layui-upload layui-inline">
+			<button type="button" class="layui-btn layui-btn-normal" id="test8"><i class="layui-icon"></i>选择文件</button>
+			<button type="button" class="layui-btn" id="test9">开始上传</button>
+		</div>
+	</div>
+	<table class="layui-hide" id="test" lay-filter="test"></table>
+	<script type="text/html" id="barDemo">
+		<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+		<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+	</script>
+
+	<body>
+	</body>
+	<script type="text/javascript" src="../layui/layui.js"></script>
+	<script type="text/javascript">
+		layui.use(['table', 'laydate', 'upload'], function() {
+			var laydate = layui.laydate;
+
+			//时间选择器常规用法
+			laydate.render({
+				elem: '#test1'
+			});
+
+			//表格数据
+			var table = layui.table;
+			//绑定数据
+			table.render({
+				elem: '#test',
+				url: '../json/address.json',
+				cols: [
+					[{
+							field: 'code',
+							width: 100,
+							title: '城市代码',
+						}, {
+							field: 'name',
+							width: 300,
+							title: '名称'
+						},
+						{
+							field: 'bartool',
+							width: 200,
+							title: '操作',
+							align: 'center',
+							toolbar: '#barDemo'
+						}
+					]
+				],
+				page: true
+			});
+
+			//监听工具条
+			table.on('tool(test)', function(obj) {
+				var data = obj.data;
+				if(obj.event === 'detail') {
+					layer.msg('城市：' + data.name);
+				} else if(obj.event === 'del') {
+					layer.confirm('真的删除行么', function(index) {
+
+						layer.msg('正在删除...', {
+							icon: 16,
+							shade: 0.01,
+							time: 2000
+						}, function() {
+							obj.del();
+							layer.close(index);
+						});
+					});
+				} else if(obj.event === 'edit') {
+					layer.alert('编辑行：<br>' + JSON.stringify(data))
+				}
+			});
+
+			//上传控件
+			//选完文件后不自动上传
+			var upload = layui.upload
+			upload.render({
+				elem: '#test8',
+				url: '/upload/',
+				auto:false,
+				accept: 'file',
+		        multiple: true
+					,
+				bindAction: '#test9',
+				done: function(res) {
+					console.log(res)
+				}
+			});
+
+		});
+	</script>
+
+</html>
